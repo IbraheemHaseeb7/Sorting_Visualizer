@@ -11,12 +11,84 @@ const MAX = 300;
 
 const WAITING_TIME = 100;
 
-const UNSORTED = 'deepskyblue';
-const SORTED = 'mediumspringgreen';
-const COMPARE = 'crimson';
-const SELECTED = 'blueviolet';
-const LEFT = 'gold';
-const RIGHT = 'orangered';
+const UNSORTED = "deepskyblue";
+const SORTED = "mediumspringgreen";
+const COMPARE = "crimson";
+const SELECTED = "blueviolet";
+const LEFT = "gold";
+const RIGHT = "orangered";
+
+const algo_data = [
+  {
+    name: "bubble",
+    time: {
+      worst: "O(n^2)",
+      best: "O(n)",
+      average: "O(n^2)",
+      space: "O(1)",
+      inversion: "O(n^2)",
+    },
+    pseudo: `
+      bubble_sort(array):
+      for i in range(len(array) - 1):
+        for j in range(len(array) - i - 1):
+          if array[j] > array[j + 1]:
+            # Swap the two elements
+            temp = array[j]
+            array[j] = array[j + 1]
+            array[j + 1] = temp
+    
+        if swapped == False:
+          break
+    
+      return array`,
+  },
+  {
+    name: "selection",
+    time: {
+      worst: "O(n^2)",
+      best: "O(n^2)",
+      average: "O(n^2)",
+      space: "O(1)",
+      inversion: "O(n^2)",
+    },
+    pseudo: `
+    selection_sort(array):
+    for i in range(len(array) - 1):
+      smallest_index = i
+      for j in range(i + 1, len(array)):
+        if array[j] < array[smallest_index]:
+          smallest_index = j
+      temp = array[i]
+      array[i] = array[smallest_index]
+      array[smallest_index] = temp
+  
+    return array`,
+  },
+  {
+    name: "insertion",
+    time: {
+      worst: "O(n^2)",
+      best: "O(n)",
+      average: "O(n^2)",
+      space: "O(1)",
+      inversion: "O(n^2)",
+    },
+    pseudo: `
+    insertion_sort(array):
+    for i in range(1, len(array)):
+      current_element = array[i]
+      j = i - 1
+  
+      while j >= 0 and array[j] > current_element:
+        array[j + 1] = array[j]
+        j -= 1
+  
+      array[j + 1] = current_element
+  
+    return array`,
+  },
+];
 
 var size;
 var delay;
@@ -31,161 +103,175 @@ var margin_element;
 var algo_selected;
 
 function updateValues() {
-    array_container_width = Math.floor( $("#array-container").width() );
-    element_width_max = Math.floor(array_container_width / 20);
+  array_container_width = Math.floor($("#array-container").width());
+  element_width_max = Math.floor(array_container_width / 20);
 
-    margin_element = 2;
-    if( parseInt( $(window).width() ) < 1200 )
-        margin_element = 1;
+  margin_element = 2;
+  if (parseInt($(window).width()) < 1200) margin_element = 1;
 }
 
 function findElementWidth() {
-    element_width = Math.floor(array_container_width / size);
-    element_width -= 2 * margin_element;
+  element_width = Math.floor(array_container_width / size);
+  element_width -= 2 * margin_element;
 
-    if(element_width > element_width_max)
-        element_width = element_width_max;
+  if (element_width > element_width_max) element_width = element_width_max;
 }
 
 function createArray() {
-    arr = [];
-    $("#array").html('');
+  arr = [];
+  $("#array").html("");
 
-    for(var i = 0; i < size; i++) {
-        var n = Math.floor( Math.random() * (MAX - MIN + 1) ) + MIN;
-        arr.push(n);
-        
-        var $element = $('<div>');
-        $element.attr('id', "e" + i);
-        $element.attr('class', "element");
-        $element.css('background-color', UNSORTED);
-        $element.css('width', element_width.toString() + 'px');
-        $element.css('height', n.toString() + 'px');
-        $element.css('margin-left', margin_element + 'px');
-        $element.css('margin-right', margin_element + 'px');
-        $element.appendTo("#array");
-    }
+  for (var i = 0; i < size; i++) {
+    var n = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
+    arr.push(n);
+
+    var $element = $("<div>");
+    $element.attr("id", "e" + i);
+    $element.attr("class", "element");
+    $element.css("background-color", UNSORTED);
+    $element.css("width", element_width.toString() + "px");
+    $element.css("height", n.toString() + "px");
+    $element.css("margin-left", margin_element + "px");
+    $element.css("margin-right", margin_element + "px");
+    $element.appendTo("#array");
+  }
 }
 
 function setHeight(id, height) {
-    $("#e" + id).css('height', height);
+  $("#e" + id).css("height", height);
 }
 
 function setColor(id, color) {
-    $("#e" + id).css('background-color', color);
+  $("#e" + id).css("background-color", color);
 }
 
 function setColorRange(p, r, color) {
-    for(var i = p; i <= r; i++)
-        $("#e" + i).css('background-color', color);
+  for (var i = p; i <= r; i++) $("#e" + i).css("background-color", color);
 }
 
 function swap(a, b) {
-    var temp = arr[a];
-    arr[a] = arr[b];
-    arr[b] = temp;
+  var temp = arr[a];
+  arr[a] = arr[b];
+  arr[b] = temp;
 
-    var h1 = $("#e" + a).css('height');
-    var h2 = $("#e" + b).css('height');
+  var h1 = $("#e" + a).css("height");
+  var h2 = $("#e" + b).css("height");
 
-    setHeight(a, h2);
-    setHeight(b, h1);
+  setHeight(a, h2);
+  setHeight(b, h1);
 }
 
 function disableOthers() {
-    $("#sort").prop('disabled', true);
-    $("#randomize").prop('disabled', true);
-    $("#size-slider").prop('disabled', true);
+  $("#sort").prop("disabled", true);
+  $("#randomize").prop("disabled", true);
+  $("#size-slider").prop("disabled", true);
 }
 
 function enableOthers() {
-    $("#sort").prop('disabled', false);
-    $("#randomize").prop('disabled', false);
-    $("#size-slider").prop('disabled', false);
+  $("#sort").prop("disabled", false);
+  $("#randomize").prop("disabled", false);
+  $("#size-slider").prop("disabled", false);
 }
 
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-$(document).ready(function() {
-    $("#size-slider").attr('min', MIN_SIZE);
-    $("#size-slider").attr('max', MAX_SIZE);
-    $("#size-slider").attr('value', DEFAULT_SIZE);
+function setAlogData(data) {
+  $("#pseudo-code").html(data.pseudo);
+  $("#worst").html(`Worst Case: ${data.time.worst}`);
+  $("#best").html(`Best Case: ${data.time.best}`);
+  $("#average").html(`Average Case${data.time.average}`);
+  $("#space").html(`Space: ${data.time.space}`);
+  $("#inversion").html(`Inversion: ${data.time.inversion}`);
+}
 
-    $("#speed-slider").attr('min', MIN_SPEED);
-    $("#speed-slider").attr('max', MAX_SPEED);
-    $("#speed-slider").attr('value', DEFAULT_SPEED);
+$(document).ready(function () {
+  $("#size-slider").attr("min", MIN_SIZE);
+  $("#size-slider").attr("max", MAX_SIZE);
+  $("#size-slider").attr("value", DEFAULT_SIZE);
 
-    size = DEFAULT_SIZE;
-    delay = WAITING_TIME * Math.pow(2, MAX_SPEED - DEFAULT_SPEED);
+  $("#speed-slider").attr("min", MIN_SPEED);
+  $("#speed-slider").attr("max", MAX_SPEED);
+  $("#speed-slider").attr("value", DEFAULT_SPEED);
 
-    updateValues();
-    
+  size = DEFAULT_SIZE;
+  delay = WAITING_TIME * Math.pow(2, MAX_SPEED - DEFAULT_SPEED);
+
+  updateValues();
+
+  findElementWidth();
+  createArray();
+
+  $("#randomize").click(function () {
+    createArray();
+  });
+
+  $(".algo-btn").click(function () {
+    algo_selected = $(this).html();
+    switch (algo_selected) {
+      case "Bubble Sort":
+        setAlogData(algo_data[0]);
+        break;
+      case "Selection Sort":
+        setAlogData(algo_data[1]);
+        break;
+      case "Insertion Sort":
+        setAlogData(algo_data[2]);
+        break;
+      default:
+        break;
+    }
+
+    $(".algo-btn-active").removeClass("algo-btn-active");
+    $(this).addClass("algo-btn-active");
+
+    $("#no-algo-warning").removeClass("display-flex");
+    $("#no-algo-warning").addClass("display-none");
+  });
+
+  $("#sort").click(async function () {
+    disableOthers();
+
+    setColorRange(0, size - 1, UNSORTED);
+    $(".about-algo").removeClass("hide-about-algo");
+
+    if (algo_selected == "Bubble Sort") {
+      await bubbleSort();
+    } else if (algo_selected == "Selection Sort") {
+      await selectionSort();
+    } else if (algo_selected == "Insertion Sort") {
+      await insertionSort();
+    } else {
+      $("#no-algo-warning").removeClass("display-none");
+      $("#no-algo-warning").addClass("display-flex");
+    }
+
+    enableOthers();
+  });
+
+  $("#size-slider").on("input", function () {
+    size = $(this).val();
+
     findElementWidth();
     createArray();
+  });
 
-    $("#randomize").click(
-        function() {
-            createArray();
-        }
-    );
+  $("#speed-slider").on("inpt", function () {
+    delay = WAITING_TIME * Math.pow(2, MAX_SPEED - $(this).val());
+  });
 
-    $(".algo-btn").click(
-        function() {
-            algo_selected = $(this).html();
+  $(window).resize(function () {
+    if (array_container_width != Math.floor($("#array-container").width())) {
+      updateValues();
 
-            $(".algo-btn-active").removeClass('algo-btn-active');
-            $(this).addClass('algo-btn-active');
+      findElementWidth();
 
-            $("#no-algo-warning").removeClass('display-flex');
-            $("#no-algo-warning").addClass('display-none');
-        }
-    );
-
-    $("#sort").click(
-        async function() {
-            disableOthers();
-
-            setColorRange(0, size - 1, UNSORTED);
-
-            if(algo_selected == "Bubble Sort")
-                await bubbleSort();
-            else if(algo_selected == "Selection Sort")
-                await selectionSort();
-            else if(algo_selected == "Insertion Sort")
-                await insertionSort();
-            else {
-                $("#no-algo-warning").removeClass('display-none');
-                $("#no-algo-warning").addClass('display-flex');
-            }
-
-            enableOthers();
-        }
-    );
-
-    $("#size-slider").on('input', function() {
-        size = $(this).val();
-
-        findElementWidth();
-        createArray();
-    });
-
-    $("#speed-slider").on('inpt', function() {
-        delay = WAITING_TIME * Math.pow(2, MAX_SPEED - $(this).val());
-    });
-
-    $(window).resize(function() {
-        if(array_container_width != Math.floor( $("#array-container").width() )) {
-            updateValues();
-
-            findElementWidth();
-
-            for(var i = 0; i < size; i++) {
-                $("#e" + i).css('width', element_width.toString() + 'px');
-                $("#e" + i).css('margin-left', margin_element + 'px');
-                $("#e" + i).css('margin-right', margin_element + 'px');
-            }
-        }
-    });
+      for (var i = 0; i < size; i++) {
+        $("#e" + i).css("width", element_width.toString() + "px");
+        $("#e" + i).css("margin-left", margin_element + "px");
+        $("#e" + i).css("margin-right", margin_element + "px");
+      }
+    }
+  });
 });
