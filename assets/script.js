@@ -209,6 +209,7 @@ $(document).ready(function () {
 
   $(".algo-btn").click(function () {
     algo_selected = $(this).html();
+    $(".about-algo").removeClass("hide-about-algo");
     switch (algo_selected) {
       case "Bubble Sort":
         setAlogData(algo_data[0]);
@@ -234,7 +235,6 @@ $(document).ready(function () {
     disableOthers();
 
     setColorRange(0, size - 1, UNSORTED);
-    $(".about-algo").removeClass("hide-about-algo");
 
     if (algo_selected == "Bubble Sort") {
       await bubbleSort();
